@@ -9,6 +9,12 @@ class GithubRepository
   end
 end
 
+class DataMapper::Query
+  def get_condition(property)
+    conditions.operands.find{|c| c.property == model.properties[property]}
+  end
+end
+
 
 module DataMapper
   module Adapters
@@ -18,7 +24,7 @@ module DataMapper
       end
 
       def read(query)
-        owner = query.conditions.operands.find{|c| c.property == query.model.properties[:owner]}.value
+        owner = query.get_condition(:owner).value
         records = GithubRepository.find_by_account(owner)
         query.filter_records(records)
       end
